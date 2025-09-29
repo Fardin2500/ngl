@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnonMsg - Send Anonymous Messages</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            animation: fadeIn 0.4s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            margin-top: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .share-box {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px dashed #667eea;
+        }
+        
+        .share-box strong {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .link-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .link-box input {
+            flex: 1;
+            background: white;
+            font-size: 14px;
+            padding: 12px;
+        }
+        
+        .btn-copy {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        
+        .btn-copy:hover {
+            background: #5568d3;
+        }
+        
+        .message-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .message-text {
+            color: #333;
+            line-height: 1.6;
+            font-size: 16px;
+            word-wrap: break-word;
+        }
+        
+        .admin-info {
+            background: #fff3cd;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #856404;
+            border-left: 3px solid #ffc107;
+        }
+        
+        .sender-name {
+            font-weight: bold;
+            color: #dc3545;
+        }
+        
+        .no-messages {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .no-messages .icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .back-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .back-btn:hover {
+            color: #5568d3;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            animation: slideInRight 0.3s;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+        
+        .username-input {
+            text-transform: lowercase;
+        }
+        
+        small {
+            display: block;
+            margin-top: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .admin-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .admin-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .admin-link a:hover {
+            text-decoration: underline;
+        }
+
+        .privacy-notice {
+            background: #e7f3ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #004085;
+            border-left: 3px solid #2196f3;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .warning-box strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #856404;
+            font-size: 15px;
+        }
+
+        .warning-box p {
+            color: #856404;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 5px;
+        }
+
+        .threat-warning {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+            
+            .logo h1 {
+                font-size: 2em;
+            }
+
+            .link-box {
+                flex-direction: column;
+            }
+
+            .btn-copy {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Toast Notification -->
+        <div id="toast" class="toast"></div>
+        
+        <!-- Home Page -->
+        <div id="pageHome" class="page active">
+            <div class="card">
+                <div class="logo">
+                    <h1>🔒 AnonMsg</h1>
+                    <p>Get Anonymous Messages</p>
+                </div>
+                
+                <div class="form-group">
+                    <label>আপনার Username তৈরি করুন:</label>
+                    <input type="text" id="usernameInput" class="username-input" placeholder="yourname" autocomplete="off">
+                    <small>⚠️ শুধু ছোট হাতের ইংরেজি অক্ষর ও নাম্বার (a-z, 0-9)</small>
+                </div>
+                
+                <button class="btn" onclick="createLink()">
+                    ✨ আমার Link তৈরি করুন
+                </button>
+            </div>
+        </div>
+        
+        <!-- Send Message Page -->
+        <div id="pageSend" class="page">
+            <div class="card">
+                <div class="logo">
+                    <h1>✉️ Send Anonymous Message</h1>
+                    <p>to <strong id="recipientName"></strong></p>
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ Important Notice:</strong>
+                    <p>• আপনার ইমেইল রিসিভার দেখবে না (সম্পূর্ণ Anonymous)</p>
+                    <p>• তবে সিকিউরিটির জন্য Admin আপনার ইমেইল দেখতে পারবে</p>
+                    <p>• হুমকি, হয়রানি বা অবৈধ মেসেজ পাঠাবেন না</p>
+                    <p>• অপব্যবহার করলে আইনি ব্যবস্থা নেওয়া হবে</p>
+                </div>
+                
+                <form onsubmit="sendMessage(event)" id="sendForm">
+                    <div class="form-group">
+                        <label>আপনার ইমেইল (শুধু Admin দেখবে):</label>
+                        <input type="email" id="senderName" required placeholder="example@gmail.com">
+                        <small>🔒 এটি সিকিউরিটির জন্য সংরক্ষিত থাকবে</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>আপনার Anonymous মেসেজ:</label>
+                        <textarea id="messageText" required placeholder="এখানে আপনার মেসেজ লিখুন...&#x0a;&#x0a;মনে রাখবেন: সম্মানজনক ও শালীন ভাষা ব্যবহার করুন 😊"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="sendBtn">
+                        📤 মেসেজ পাঠান
+                    </button>
+                    
+                    <button type="button" class="btn btn-secondary" onclick="goHome()">
+                        ← হোমে ফিরে যান
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Inbox Page -->
+        <div id="pageInbox" class="page">
+            <div class="card">
+                <button class="back-btn" onclick="goHome()">←</button>
+                
+                <div class="logo">
+                    <h1>📬 Your Inbox</h1>
+                    <p id="inboxUsername"></p>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="messageCount">0</div>
+                        <div class="stat-label">Messages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="todayCount">0</div>
+                        <div class="stat-label">Today</div>
+                    </div>
+                </div>
+                
+                <div class="share-box">
+                    <strong>📤 এই লিংক শেয়ার করুন:</strong>
+                    <div class="link-box">
+                        <input type="text" id="shareLink" readonly>
+                        <button class="btn-copy" onclick="copyLink()">Copy</button>
+                    </div>
+                </div>
+
+                <div class="privacy-notice">
+                    🔒 <strong>Privacy:</strong> মেসেজ পাঠানোর সময় সেন্ডারের ইমেইল সংরক্ষণ করা হয়, তবে আপনি দেখতে পারবেন না। এটি শুধুমাত্র সিকিউরিটি ও আইনি প্রয়োজনে Admin দেখতে পারবে।
+                </div>
+                
+                <div id="messageList"></div>
+                
+                <button class="btn btn-secondary" onclick="refreshInbox()">
+                    🔄 Refresh
+                </button>
+            </div>
+        </div>
+        
+        <!-- Admin Login Page -->
+        <div id="pageAdminLogin" class="page">
+            <div class="card">
+                <button class="back-btn" onclick="goHome()">←</button>
+                
+                <div class="logo">
+                    <h1>🔐 Admin Login</h1>
+                    <p>Admin Only Area</p>
+                </div>
+                
+                <form onsubmit="adminLogin(event)">
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text" id="adminUser" required placeholder="admin">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="adminPass" required placeholder="admin123">
+                    </div>
+                    
+                    <button type="submit" class="btn">
+                        🔓 Login
+                    </button>
+                </form>
+
+                <div style="background: #e7f3ff; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 13px; text-align: center; color: #004085;">
+                    <strong>Demo:</strong> admin / admin123
+                </div>
+            </div>
+        </div>
+        
+        <!-- Admin Panel -->
+        <div id="pageAdmin" class="page">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: #333;">👨‍💼 Admin Panel</h2>
+                    <button onclick="goHome()" class="btn-copy" style="background: #dc3545;">Logout</button>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalMessages">0</div>
+                        <div class="stat-label">Total Messages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalUsers">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" id="adminSearch" placeholder="🔍 Search by sender, receiver or message..." oninput="searchMessages()">
+                </div>
+                
+                <div id="adminMessageList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKLNHaspQ_QUxLPsW94lceTSB0dfqA6Gg",
+            authDomain: "ngl-b22fa.firebaseapp.com",
+            databaseURL: "https://ngl-b22fa-default-rtdb.firebaseio.com",
+            projectId: "ngl-b22fa",
+            storageBucket: "ngl-b22fa.firebasestorage.app",
+            messagingSenderId: "761080988015",
+            appId: "1:761080988015:web:a76a3a08e19c8bb1afa89a"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Global variables
+        let currentUser = '';
+        let allMessages = [];
+        const ADMIN_USER = 'admin';
+        const ADMIN_PASS = 'admin123';
+
+        // Make functions global
+        window.createLink = createLink;
+        window.sendMessage = sendMessage;
+        window.refreshInbox = refreshInbox;
+        window.copyLink = copyLink;
+        window.showAdminLogin = showAdminLogin;
+        window.adminLogin = adminLogin;
+        window.searchMessages = searchMessages;
+        window.goHome = goHome;
+
+        // Initialize
+        window.onload = function() {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                showSendPage(hash);
+            }
+        };
+
+        // Show pages
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Go home
+        function goHome() {
+            window.location.hash = '';
+            showPage('pageHome');
+            document.getElementById('usernameInput').value = '';
+        }
+
+        // Create link
+        function createLink() {
+            const username = document.getElementById('usernameInput').value.trim().toLowerCase();
+
+            if (!username) {
+                showToast('❌ Username লিখুন!');
+                return;
+            }
+
+            if (!/^[a-z0-9]+$/.test(username)) {
+                showToast('❌ শুধু ছোট হাতের ইংরেজি অক্ষর ও নাম্বার ব্যবহার করুন!');
+                return;
+            }
+
+            showInboxPage(username);
+        }
+
+        // Show inbox
+        function showInboxPage(username) {
+            currentUser = username;
+            document.getElementById('inboxUsername').textContent = '@' + username;
+
+            const baseUrl = window.location.href.split('#')[0];
+            const link = baseUrl + '#' + username;
+            document.getElementById('shareLink').value = link;
+
+            loadUserMessages(username);
+            showPage('pageInbox');
+        }
+
+        // Load user messages from Firebase
+        function loadUserMessages(username) {
+            const messagesRef = ref(database, 'messages');
+            
+            onValue(messagesRef, (snapshot) => {
+                const data = snapshot.val();
+                const userMessages = [];
+
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        if (data[key].to === username) {
+                            userMessages.push({ id: key, ...data[key] });
+                        }
+                    });
+                }
+
+                displayUserMessages(userMessages);
+            });
+        }
+
+        // Display user messages
+        function displayUserMessages(messages) {
+            const messageList = document.getElementById('messageList');
+            const today = new Date().toDateString();
+            const todayMessages = messages.filter(m => new Date(m.timestamp).toDateString() === today);
+
+            document.getElementById('messageCount').textContent = messages.length;
+            document.getElementById('todayCount').textContent = todayMessages.length;
+
+            if (messages.length === 0) {
+                messageList.innerHTML = `
+                    <div class="no-messages">
+                        <div class="icon">📭</div>
+                        <p>এখনো কোনো মেসেজ নেই</p>
+                        <p style="font-size: 14px; margin-top: 10px;">আপনার link শেয়ার করুন!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            messages.sort((a, b) => b.timestamp - a.timestamp);
+
+            messageList.innerHTML = messages.map(msg => `
+                <div class="message-box">
+                    <div class="message-header">
+                        <span>🎭 Anonymous</span>
+                        <span>${new Date(msg.timestamp).toLocaleString('bn-BD')}</span>
+                    </div>
+                    <div class="message-text">${escapeHtml(msg.text)}</div>
+                </div>
+            `).join('');
+        }
+
+        // Refresh inbox
+        function refreshInbox() {
+            loadUserMessages(currentUser);
+            showToast('🔄 Refreshed!');
+        }
+
+        // Show send page
+        function showSendPage(username) {
+            currentUser = username;
+            document.getElementById('recipientName').textContent = '@' + username;
+            showPage('pageSend');
+            window.location.hash = username;
+        }
+
+        // Send message to Firebase
+        async function sendMessage(e) {
+            e.preventDefault();
+
+            const senderName = document.getElementById('senderName').value.trim();
+            const text = document.getElementById('messageText').value.trim();
+            const sendBtn = document.getElementById('sendBtn');
+
+            if (!senderName || !text) {
+                showToast('❌ সব ফিল্ড পূরণ করুন!');
+                return;
+            }
+
+            sendBtn.disabled = true;
+            sendBtn.textContent = '⏳ পাঠানো হচ্ছে...';
+
+            try {
+                const messagesRef = ref(database, 'messages');
+                const newMessageRef = push(messagesRef);
+
+                await set(newMessageRef, {
+                    from: senderName,
+                    to: currentUser,
+                    text: text,
+                    timestamp: Date.now()
+                });
+
+                showToast('✅ মেসেজ সফলভাবে পাঠানো হয়েছে!');
+                document.getElementById('sendForm').reset();
+
+                setTimeout(() => {
+                    goHome();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showToast('❌ মেসেজ পাঠাতে সমস্যা হয়েছে!');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = '📤 মেসেজ পাঠান';
+            }
+        }
+
+        // Copy link
+        function copyLink() {
+            const input = document.getElementById('shareLink');
+            input.select();
+            input.setSelectionRange(0, 99999);
+
+            try {
+                document.execCommand('copy');
+                showToast('✅ Link copied!');
+            } catch (err) {
+                navigator.clipboard.writeText(input.value).then(() => {
+                    showToast('✅ Link copied!');
+                });
+            }
+        }
+
+        // Show admin login
+        function showAdminLogin() {
+            showPage('pageAdminLogin');
+        }
+
+        // Admin login
+        function adminLogin(e) {
+            e.preventDefault();
+
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+
+            if (user === ADMIN_USER && pass === ADMIN_PASS) {
+                loadAdminPanel();
+                showPage('pageAdmin');
+                showToast('✅ Admin login successful!');
+            } else {
+                showToast('❌ Wrong credentials!');
+            }
+        }
+
+        // Load admin panel
+        function loadAdminPanel() {
+            const messagesRef = ref(database, 'messages');
+
+            onValue(messagesRef, (snapshot) => {
+                const data = snapshot.val();
+                allMessages = [];
+
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        allMessages.push({ id: key, ...data[key] });
+                    });
+                }
+
+                displayAdminMessages(allMessages);
+                updateAdminStats(allMessages);
+            });
+        }
+
+        // Update admin stats
+        function updateAdminStats(messages) {
+            const uniqueUsers = new Set(messages.map(m => m.to));
+            document.getElementById('totalMessages').textContent = messages.length;
+            document.getElementById('totalUsers').textContent = uniqueUsers.size;
+        }
+
+        // Display admin messages
+        function displayAdminMessages(msgs) {
+            const list = document.getElementById('adminMessageList');
+
+            if (msgs.length === 0) {
+                list.innerHTML = `
+                    <div class="no-messages">
+                        <div class="icon">📭</div>
+                        <p>No messages yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            msgs.sort((a, b) => b.timestamp - a.timestamp);
+
+            list.innerHTML = msgs.map(msg => `
+                <div class="message-box ${checkThreat(msg.text) ? 'threat-warning' : ''}">
+                    <div class="message-header">
+                        <span>📩 To: @${msg.to}</span>
+                        <span>${new Date(msg.timestamp).toLocaleString('bn-BD')}</span>
+                    </div>
+                    <div class="message-text">${escapeHtml(msg.text)}</div>
+                    <div class="admin-info">
+                        <strong>🔒 Sender Info (Admin Only):</strong><br>
+                        <span class="sender-name">Name: ${escapeHtml(msg.from)}</span><br>
+                        <span style="font-size: 12px; color: #666;">Sent: ${new Date(msg.timestamp).toLocaleString('en-US')}</span>
+                        ${checkThreat(msg.text) ? '<br><span style="color: #dc3545; font-weight: bold;">⚠️ Potential Threat Detected!</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Check for threatening content
+        function checkThreat(text) {
+            const threats = ['মেরে', 'মার', 'kill', 'murder', 'threat', 'হুমকি', 'ক্ষতি', 'বোমা', 'bomb'];
+            return threats.some(word => text.toLowerCase().includes(word));
+        }
+
+        // Search messages
+        function searchMessages() {
+            const query = document.getElementById('adminSearch').value.toLowerCase();
+            const filtered = allMessages.filter(m =>
+                m.from.toLowerCase().includes(query) ||
+                m.to.toLowerCase().includes(query) ||
+                m.text.toLowerCase().includes(query)
+            );
+            displayAdminMessages(filtered);
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Show toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
