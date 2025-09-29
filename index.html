@@ -395,13 +395,13 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>আপনার Username তৈরি করুন:</label>
+                    <label>Your Username Create </label>
                     <input type="text" id="usernameInput" class="username-input" placeholder="yourname" autocomplete="off">
-                    <small>⚠️ শুধু ছোট হাতের ইংরেজি অক্ষর ও নাম্বার (a-z, 0-9)</small>
+                    <small>⚠️ Only lowercase English letters and numbers (a-z, 0-9)</small>
                 </div>
                 
                 <button class="btn" onclick="createLink()">
-                    ✨ আমার Link তৈরি করুন
+                    ✨ Create my link
                 </button>
             </div>
         </div>
@@ -416,30 +416,30 @@
 
                 <div class="warning-box">
                     <strong>⚠️ Important Notice:</strong>
-                    <p>• আপনার ইমেইল রিসিভার দেখবে না (সম্পূর্ণ Anonymous)</p>
-                    <p>• তবে সিকিউরিটির জন্য Admin আপনার ইমেইল দেখতে পারবে</p>
-                    <p>• হুমকি, হয়রানি বা অবৈধ মেসেজ পাঠাবেন না</p>
-                    <p>• অপব্যবহার করলে আইনি ব্যবস্থা নেওয়া হবে</p>
+                    <p>• Your email will not be seen by the receiver (completely anonymous)</p>
+                    <p>• However, for security reasons, the admin will be able to see your email.</p>
+                    <p>• Do not send threatening, harassing, or illegal messages.</p>
+                    <p>• Legal action will be taken if misused.</p>
                 </div>
                 
                 <form onsubmit="sendMessage(event)" id="sendForm">
                     <div class="form-group">
-                        <label>আপনার ইমেইল (শুধু Admin দেখবে):</label>
+                        <label>Your email (only Admin will see)</label>
                         <input type="email" id="senderName" required placeholder="example@gmail.com">
-                        <small>🔒 এটি সিকিউরিটির জন্য সংরক্ষিত থাকবে</small>
+                        <small>🔒 This will be reserved for security purposes.</small>
                     </div>
 
                     <div class="form-group">
-                        <label>আপনার Anonymous মেসেজ:</label>
-                        <textarea id="messageText" required placeholder="এখানে আপনার মেসেজ লিখুন...&#x0a;&#x0a;মনে রাখবেন: সম্মানজনক ও শালীন ভাষা ব্যবহার করুন 😊"></textarea>
+                        <label>Your Anonymous message</label>
+                        <textarea id="messageText" required placeholder="Enter your message here...&#x0a;&#x0a; Remember: Use respectful and polite language 😊 😊"></textarea>
                     </div>
                     
                     <button type="submit" class="btn" id="sendBtn">
-                        📤 মেসেজ পাঠান
+                        📤 send message
                     </button>
                     
                     <button type="button" class="btn btn-secondary" onclick="goHome()">
-                        ← হোমে ফিরে যান
+                        ← Return to Home
                     </button>
                 </form>
             </div>
@@ -467,7 +467,7 @@
                 </div>
                 
                 <div class="share-box">
-                    <strong>📤 এই লিংক শেয়ার করুন:</strong>
+                    <strong>📤 Share this link:</strong>
                     <div class="link-box">
                         <input type="text" id="shareLink" readonly>
                         <button class="btn-copy" onclick="copyLink()">Copy</button>
@@ -475,7 +475,7 @@
                 </div>
 
                 <div class="privacy-notice">
-                    🔒 <strong>Privacy:</strong> মেসেজ পাঠানোর সময় সেন্ডারের ইমেইল সংরক্ষণ করা হয়, তবে আপনি দেখতে পারবেন না। এটি শুধুমাত্র সিকিউরিটি ও আইনি প্রয়োজনে Admin দেখতে পারবে।
+                    🔒 <strong>Privacy:</strong> The sender's email address is stored when sending a message, but you cannot see it. It can only be viewed by the admin for security and legal purposes.
                 </div>
                 
                 <div id="messageList"></div>
@@ -513,7 +513,7 @@
                 </form>
 
                 <div style="background: #e7f3ff; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 13px; text-align: center; color: #004085;">
-                    <strong>Demo:</strong> admin / admin123
+                   
                 </div>
             </div>
         </div>
@@ -608,12 +608,12 @@
             const username = document.getElementById('usernameInput').value.trim().toLowerCase();
 
             if (!username) {
-                showToast('❌ Username লিখুন!');
+                showToast('❌ Enter Username!');
                 return;
             }
 
             if (!/^[a-z0-9]+$/.test(username)) {
-                showToast('❌ শুধু ছোট হাতের ইংরেজি অক্ষর ও নাম্বার ব্যবহার করুন!');
+                showToast('❌ Use only lowercase English letters and numbers!');
                 return;
             }
 
@@ -667,7 +667,7 @@
                     <div class="no-messages">
                         <div class="icon">📭</div>
                         <p>এখনো কোনো মেসেজ নেই</p>
-                        <p style="font-size: 14px; margin-top: 10px;">আপনার link শেয়ার করুন!</p>
+                        <p style="font-size: 14px; margin-top: 10px;">Share your link!</p>
                     </div>
                 `;
                 return;
@@ -709,12 +709,12 @@
             const sendBtn = document.getElementById('sendBtn');
 
             if (!senderName || !text) {
-                showToast('❌ সব ফিল্ড পূরণ করুন!');
+                showToast('❌ Fill in all fields!');
                 return;
             }
 
             sendBtn.disabled = true;
-            sendBtn.textContent = '⏳ পাঠানো হচ্ছে...';
+            sendBtn.textContent = '⏳ Sending...';
 
             try {
                 const messagesRef = ref(database, 'messages');
@@ -727,7 +727,7 @@
                     timestamp: Date.now()
                 });
 
-                showToast('✅ মেসেজ সফলভাবে পাঠানো হয়েছে!');
+                showToast('✅ Message sent successfully!');
                 document.getElementById('sendForm').reset();
 
                 setTimeout(() => {
@@ -736,10 +736,10 @@
 
             } catch (error) {
                 console.error('Error sending message:', error);
-                showToast('❌ মেসেজ পাঠাতে সমস্যা হয়েছে!');
+                showToast('❌There was a problem sending the message!');
             } finally {
                 sendBtn.disabled = false;
-                sendBtn.textContent = '📤 মেসেজ পাঠান';
+                sendBtn.textContent = '📤 Send message ';
             }
         }
 
